@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+	<title>wave_btn</title>
+	<style type="text/css">
+		.wave_btn{
+			position: absolute;
+			width:200px;
+			height:50px;
+			padding: 0;
+			background-color: green;
+			overflow: hidden;
+			border: none;
+		}
+		/*
+		.wave_btn div{
+			position: absolute;
+			-webkit-border-radius: 200px
+		}*/
+	</style>	
+</head>
+<body>
+	<div style="height:20px"></div>
+	<button id="wave_btn" class="wave_btn"></button>
+	
+	<script>
+		document.getElementById("wave_btn").onclick = function(e) {
+			if ( !! this.state) {
+				this.removeChild(this.state.canvas);
+				this.state.canvas = null;
+			}
+
+			this.state = {
+				origin: {
+					x: e.offsetX,
+					y: e.offsetY
+				},
+				btn: {
+					dom: this,
+					offsetTop: this.offsetTop,
+					offsetLeft: this.offsetLeft,
+					width: this.offsetWidth,
+					height: this.offsetHeight
+				},
+				r: 3,
+				maxR: 0,
+				speed: 3,
+				canvas: null,
+				context: null
+			};
+
+			var canvas = document.createElement("canvas");
+	
+			this.appendChild(canvas);
+
+			var context = canvas.getContext("2d");
+
+			this.state.canvas = canvas;
+			this.state.context = context;
+
+			this.state.maxR = getMaxR(this.state);
+
+			change(this.state);
+		};
+
+		function getDistance(a, b) {
+			var res = Math.pow(a, 2) + Math.pow(b, 2);
+			res = Math.sqrt(res);
+			return res;
+		}
+
+		function getMaxR(state) {
+			var toTop = state.origin.y - state.btn.offsetTop,
+				toLeft = state.origin.x - state.btn.offsetLeft,
+				toBottom = state.btn.height - state.origin.y,
+				roRight = state.btn.width - state.origin.x;
+
+			var toLeftTop = getDistance(toTop, toLeft),
+				toLeftBottom = getDistance(toLeft, toBottom),
+				toRightTop = getDistance(roRight, toTop),
+				toRightBottom = getDistance(roRight, toBottom);
+
+			return Math.max(toLeftTop, toLeftBottom, toRightTop, toRightBottom);
+		}
+
+		function change(state) {
+			if (state.r >= state.maxR) {
+				if ( !! state.canvas) {
+					state.btn.dom.removeChild(state.canvas);
+				}
+				state.btn.dom.state = null;
+				return false;
+			}
+
+			state.context.clearRect(0, 0, state.btn.width, state.btn.height);
+
+			state.context.fillStyle = "rgba(255,255,255,0.3)";
+			state.context.arc(state.origin.x, state.origin.y, state.r += state.speed, 0, 2 * Math.PI, true);
+			state.context.fill();
+
+			window.requestAnimationFrame(function() {
+				change(state);
+			});
+		}
+	</script>
+</body>
+</html>
