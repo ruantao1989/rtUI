@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+	<title>img lazyLoad</title>
+	<style type="text/css">
+		.space{
+			height:500px;
+			border:2px red solid
+		}
+	</style>
+</head>
+<body>
+
+	<div id="imgContent">
+
+		<div class="space"></div>
+
+		<img src="http://www.baidu.com/img/bdlogo.png" ></img>
+
+		<div class="space"></div>
+		
+		<img src="https://www.google.com/images/srpr/logo11w.png" ></img>
+
+	</div>
+	
+
+	<script>
+		var domReady = (function () {
+		    var fn = [];    //待执行函数队列
+		    var ready = false;  //标志位：是否已经DOM Loaded
+		    //执行队列
+		    var fireEvent = function () {
+		        for (var i = 0; i < fn.length; i++) {   //fn.length：动态更新fn队列长度，队列中的函数可能向队列添加函数
+		            fn[i]();
+		        }
+		        ready = true;
+		        fn = null;  //删除函数队列
+		    }
+		    if (document.addEventListener) {        //使用标准的DOMContentLoaded
+		        document.addEventListener('DOMContentLoaded', function () {
+		            fireEvent();
+		            document.removeEventListener('DOMContentLoaded', arguments.callee, false);
+		        }, false);
+		    } else {
+		        //IE6/7/8在页面执行时不断检测doScroll方法是否可用
+		        (function ieDomReady () {
+		            if (ready) return;
+		            try {
+		                document.documentElement.doScroll('left');
+		            } catch (e) {
+		                setTimeout(ieDomReady, 10);
+		                return;
+		            }
+		            fireEvent();
+		         })();
+		    }
+		    return function (f) {
+		        ready && f();
+		        ready || fn.push(f);
+		    }
+		})();
+
+
+		////////////////////////////
+		domReady(function(){
+			
+			function lazyload(domId){
+				var imgs = null,
+					timer = null;
+				//TODO 传入id数组
+				var initImgs = function(){
+					if (!domId) {
+						imgs = document.getElementsByTagName("img");
+					} else {
+						var dom = document.getElementById("domId");
+						if( !dom ){
+							imgs = document.getElementsByTagName("img");
+						}
+					}
+				};
+				var preLoadImgs = function(){
+					for( var i=0,len=imgs.length;i<len;i++){
+						var img = imgs[i];
+						var rawSrc = img.getAttribute('src');
+						img.src = "";
+						img.setAttribute("srcLoad",rawSrc);
+					}
+				};
+				var setSrc = function() {
+					var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+					var viewportSize = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+
+					//console.log("run");
+					var loadedNum = 0;
+					for (var i = 0, len = imgs.length; i < len; i++) {
+						var img = imgs[i];
+						var x = scrollTop + viewportSize - img.offsetTop;
+						if (x > 0) {
+							img.src = img.getAttribute('srcLoad');
+							loadedNum++;
+
+							//结束轮询
+							if (loadedNum === len) {
+								//console.log("all loaded");
+								clearInterval(timer);
+							}
+						}
+					}
+				};
+				var run = function(){
+					initImgs();
+					preLoadImgs();
+					timer = setInterval(setSrc,500);
+				};
+
+				run();
+		    }
+
+		    lazyload("imgContent");
+		});
+	</script>
+</body>
+</html>
