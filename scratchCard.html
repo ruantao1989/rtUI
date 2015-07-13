@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+	<title>scratch_Card</title>
+	<style type="text/css">
+		.scratchCard {
+		    position: relative;
+		    width:300px;
+			height:150px;
+			
+		}
+		.scratchCard canvas {
+		    position:absolute;
+		    left:0px;
+		    top:0px;
+		    /*border:1px red solid;*/
+		}
+	</style>	
+</head>
+<body>
+	<div style="height:30px"></div>
+
+	<div id="scratchCard" class="scratchCard">
+		<canvas id="mask"></canvas>
+		<canvas id="text"></canvas>
+	</div>
+	
+	
+	
+	
+	<script>
+		function getRandom(min, max, accuracy) {
+			var sub = max - min,
+				rdNum = Math.random() * sub + min;
+			return rdNum.toFixed(accuracy);
+		}
+
+
+		window.onload = function(){
+			scratchCard();
+		}
+
+		
+		function scratchCard(){
+			var text = document.getElementById('text'),
+				mask = document.getElementById('mask');
+
+			drawText();
+			drawMask();
+			initState();
+			
+			mask.addEventListener('mousedown', mousedown); 
+    		mask.addEventListener('mouseup', mouseup); 
+    		mask.addEventListener('mousemove', mousemove);
+		}
+
+		function initState(){
+			SCRATCH_CARD = {
+				lock : false,
+				mousedown:false
+			}
+		}
+
+		//画文本
+		function drawText() {
+			var context = text.getContext('2d'),
+				textStr = "再来一瓶";
+
+			var fontSize = 30;	
+
+			context.font = 'bold '+fontSize+'px serif';
+			context.textAlign='center';//文本水平对齐方式
+			context.textBaseline='middle';//文本垂直方向，基线位置 
+			context.fillStyle = '#999';
+			//context.strokeStyle = '#888';
+			//context.fillText(textStr, text.width/2,text.height/2);
+			measure = context.measureText("text");
+			context.fillText(textStr, getRandom(measure.width,text.width-measure.width),
+				getRandom(fontSize,text.height-fontSize));
+			//context.strokeText(textStr, text.width/2,text.height/2);
+			//mask.style.zIndex = 20;
+		};
+
+		function drawMask() {
+			context = mask.getContext('2d');
+			context.fillStyle = "#888";
+		    context.fillRect(0, 0, mask.width,mask.height);//绘制矩形
+
+		    mask.style.zIndex = 10;
+
+		    context.globalCompositeOperation = "destination-out";
+		};
+
+		function mousedown(){
+			SCRATCH_CARD.mousedown = true;
+		}
+		function mouseup(){
+			SCRATCH_CARD.mousedown = false;
+		}
+		function mousemove(e){
+			if( false === SCRATCH_CARD.mousedown ){
+				return;
+			}
+
+			if( false === SCRATCH_CARD.lock ){
+				SCRATCH_CARD.lock = true;
+
+				var offsetX = mask.parentNode.offsetLeft, 
+	       			offsetY = mask.parentNode.offsetTop;
+				var x = (e.clientX + document.body.scrollLeft || e.pageX) - offsetX || 0, 
+	                y = (e.clientY + document.body.scrollTop || e.pageY) - offsetY || 0; 
+
+	            context = mask.getContext('2d');
+	            context.beginPath();
+	            context.fillStyle="white";//'transparent';
+	            context.arc(x, y, 15, 0, Math.PI * 2);//绘制圆点
+	            context.fill();
+
+	            SCRATCH_CARD.lock = false;
+	        }
+		}
+	</script>
+</body>
+</html>

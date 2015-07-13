@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+	<title>circle_progressBar</title>
+	<style type="text/css">
+		.circleProgressBar{
+			position: relative;
+			width: 200px;
+			height:200px;
+		}
+		.circleProgressBar canvas{
+			position: absolute;
+			border: 1px red solid;
+		}
+	</style>	
+</head>
+<body>
+	<div style="height:30px"></div>
+	
+	<div id="circleProgressBar" class="circleProgressBar">
+		<!--<canvas id="progress"></canvas>
+		<canvas id="text"></canvas>
+		<canvas id="background"></canvas>-->
+	</div>
+	
+	<!--
+	<canvas id="background"></canvas>-->
+
+	<script>
+		window.onload = function(){
+			//circleProgressBar();
+			var _progress = 0;
+			var circle = new CircleProgressBar({
+				containerDomId : "circleProgressBar",
+				width: 200,
+				height: 200,
+				radius : 50,
+				lineWidth : 18,
+				baseZIndex: 10,
+
+				progress:_progress,
+				//callback: callBackFun
+			});
+
+			//测试
+			var timer = setInterval(function(){
+				_progress++;
+				circle.set(_progress);
+
+				if(_progress > 100){
+					clearInterval(timer);
+				}
+			},100)
+		}
+
+		var CircleProgressBar = CircleProgressBar || {};
+		var CircleProgressBar = function(ops){
+			this.containerDomId = ops.containerDomId;
+			this.containerDom = document.getElementById(ops.containerDomId);
+			this.width = ops.width;
+			this.height = ops.height;
+			this.radius = ops.radius;
+			this.lineWidth = ops.lineWidth;
+
+			this.backgroundCanvas = null;
+			this.textCanvas = null;
+			this.progressCanvas = null;
+
+			this.progress = ops.progress;
+
+			this.init();
+		}
+		CircleProgressBar.prototype.set =function (progress){
+			this.setPercent(progress);
+			this.setText(progress);
+		}
+		////////////////////////////////////////////////////////////////////////////
+		CircleProgressBar.prototype.init =function (){
+			this.backgroundCanvas = this.createBackgroundCanvas();
+			this.textCanvas = this.createTextCanvas();
+			this.progressCanvas = this.createPercentCanvas();
+		}
+		CircleProgressBar.prototype.createBackgroundCanvas = function(){
+			var bg = document.createElement("canvas");
+			bg.id = this.containerDomId+"_background";
+			bg.width = this.width;
+			bg.height = this.height;
+			ctx = bg.getContext('2d');
+
+			ctx.beginPath();
+		    ctx.arc(bg.width/2, bg.height/2, this.radius, 0, Math.PI*2,false);  // 坐标为250的圆，这里起始角度是0，结束角度是Math.PI*2
+		    ctx.lineWidth = this.lineWidth;
+		    ctx.strokeStyle = "#999";//strokeStyle;
+		    ctx.stroke();
+		    bg.style.zIndex = this.baseZIndex;
+
+		    this.containerDom.appendChild(bg);
+		    return bg;
+		}
+		CircleProgressBar.prototype.createPercentCanvas = function(){
+			var progress = document.createElement("canvas");
+			progress.id = this.containerDomId+"_progress";
+			progress.width = this.width;
+			progress.height = this.height;
+
+		    progress.style.zIndex = this.baseZIndex+1;
+
+		    this.containerDom.appendChild(progress);
+		    return progress;
+		}
+		CircleProgressBar.prototype.setPercent = function(percent){
+			ctx = this.progressCanvas.getContext('2d');
+
+	        var zeroPer = (1.5 * Math.PI );
+	        var anglePerSec = (2 * Math.PI) *  percent / 100 - (2.5 * Math.PI); // 蓝色的弧度
+
+	        ctx.beginPath();
+		    ctx.arc(this.progressCanvas.width/2, this.progressCanvas.height/2, this.radius, zeroPer, anglePerSec,false);  // 坐标为250的圆，这里起始角度是0，结束角度是Math.PI*2
+		    ctx.lineWidth = this.lineWidth;
+		    ctx.strokeStyle = "#3399FE";//strokeStyle;
+		    ctx.lineCap = 'round';
+		    ctx.stroke();
+		}
+		CircleProgressBar.prototype.createTextCanvas = function(){
+			var textStr = this.progress+"%";	
+			var text = document.createElement("canvas");
+			text.id = this.containerDomId+"_text";
+			text.width = this.width;
+			text.height = this.height;
+		    text.style.zIndex = this.baseZIndex+3;
+
+		    this.containerDom.appendChild(text);
+		    return text;
+		}
+		CircleProgressBar.prototype.setText = function(percent){
+			context = this.textCanvas.getContext('2d');
+			context.clearRect(0,0,this.width,this.height);
+			context.font = 'bold '+30+'px serif';
+			context.textAlign='center';//文本水平对齐方式
+			context.textBaseline='middle';//文本垂直方向，基线位置 
+			context.fillStyle = '#999';
+			var textStr = percent+"%";
+			context.fillText(textStr, this.width/2,this.height/2);
+		}
+	</script>
+</body>
+</html>
