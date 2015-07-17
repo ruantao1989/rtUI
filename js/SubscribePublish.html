@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>订阅者发布者模式</title>
+	<style type="text/css">
+		
+	</style>	
+</head>
+<body>
+	<script>
+		var EventUtil = {
+			on:function(type,obj,fun){
+				//创建events对象
+				if( "undefined" === typeof obj.events ){
+					obj.events = [];
+				}
+				//events对象下, 事件数组
+				if( "undefined" === typeof obj.events[type] ){
+					obj.events[type] = [];
+				}
+
+				obj.events[type].push(fun);
+			},
+			off:function(type,obj){
+				
+			},
+			trigger: function(type,obj){
+				if( "undefined" === typeof obj.events ){
+					return false;
+				}
+				if( "undefined" === typeof obj.events[type] ){
+					return false;
+				}
+				//遍历触发
+				var eventsOfType = obj.events[type];
+				for(var i=0,len=eventsOfType.length;i<len;i++){
+					var fun = eventsOfType[i];
+					fun.apply(obj,null);
+				}
+			}
+		}
+
+
+		var obj = {};
+		var fun1 = function(){
+			alert("EventUtil__1");
+		}
+		var fun2 = function(){
+			alert("EventUtil__2");
+		}
+		//绑定事件
+		EventUtil.on("myEvt",obj,fun1);
+		EventUtil.on("myEvt",obj,fun2);
+		//触发事件
+		EventUtil.trigger("myEvt",obj);
+	</script>
+</body>
+</html>

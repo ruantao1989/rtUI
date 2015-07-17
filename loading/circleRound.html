@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>loading加载样式</title>
+	<style type="text/css">
+		.center{
+			display: -webkit-box;
+		    /*display: -webkit-flex;*/
+		    display: -moz-box;
+		    /*display: -moz-flex;
+		    display: -ms-flexbox;
+		    display: flex;
+	         水平居中*/
+			-webkit-box-align: center;
+			-moz-box-align: center;
+			-ms-flex-pack:center;/* IE 10 */
+			-webkit-justify-content: center;
+			-moz-justify-content: center;
+			justify-content: center;/* IE 11+,Firefox 22+,Chrome 29+,Opera 12.1*/
+			/* 垂直居中 */
+			-webkit-box-pack: center;
+			-moz-box-pack: center;
+			-ms-flex-align:center;/* IE 10 */
+			-webkit-align-items: center;
+			-moz-align-items: center;
+			align-items: center;
+		}
+		.loading{
+			position: relative;
+            width:200px;
+            height:200px;
+            background-color: rgba(0,0,0,0.8);
+            border-radius:20px;
+        }
+        .circle{
+            /*display:inline-block;*/
+            width:160px;
+            height:160px;
+            border-radius:80px;
+            background: #EDEBEB;
+	        background-image:-webkit-linear-gradient(-180deg, rgba(180,180,180,0.9), rgba(250,250,250,0.9));
+	        background-image:-moz-linear-gradient(-180deg, rgba(180,180,180,0.9), rgba(250,250,250,0.9));
+	        background-image:-o-linear-gradient(-180deg, rgba(180,180,180,0.9), rgba(250,250,250,0.9));
+	        background-image:linear-gradient(-180deg, rgba(180,180,180,0.9), rgba(250,250,250,0.9));
+            -webkit-animation: rotate 1s ease infinite;
+        }
+        @-webkit-keyframes rotate {
+		  from {-webkit-transform:rotate(0deg);}
+		  to {-webkit-transform:rotate(360deg);}
+		}
+       	.masker{
+            width:120px;
+            height:120px;
+            border-radius:60px;
+            background-color: rgba(0,0,0,0.8);
+        }
+	</style>	
+</head>
+<body>
+
+	<div class="loading center">
+		<div class="circle center">
+			<div class="masker"></div>
+		</div>
+	</div>
+
+</body>
+</html>
