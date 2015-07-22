@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>drag</title>
+	<style type="text/css">
+		.container{
+			position: relative;
+			width:400px;
+			height:400px;
+			border: 1px solid black;
+		}
+		.drag{
+			position: absolute;
+			width:100px;
+			height:100px;
+			background-color: #999;
+		}
+	</style>	
+</head>
+<body>
+	<div class="container">
+		<div class="drag" id="drag"></div>
+	</div>
+	
+	<script>
+		window.onload = function() {
+			new Drag("drag");
+		}
+
+		var Drag = function(objId) {
+			this.dragingDom = document.getElementById(objId);
+			this.isMouseDown = false;
+			this.oldPos = {},
+				oldMousePos = {};
+
+			this.dragingDom.onmousemove = hoverFun;
+			var that = this;
+			this.dragingDom.onmousedown = function(e) {
+				//旧位置
+				that.oldPos = {
+					x: this.offsetLeft,
+					y: this.offsetTop
+				};
+				//旧鼠标位置
+				that.oldMousePos = {
+					x: event.pageX,
+					y: event.pageY
+				}
+				that.isMouseDown = true;
+
+				//注册移动事件
+				that.dragingDom.onmousemove = onmousemoveFun;
+			}
+			document.onmouseup = function(e) {
+				that.isMouseDown = false;
+
+				//注销移动事件
+				that.dragingDom.onmousemove = hoverFun;
+				that.dragingDom.style.cursor = "";
+			}
+
+			function onmousemoveFun(e) {
+				if (true === that.isMouseDown) {
+					//鼠标移动的值
+					var mouseMoved = {
+						x: e.pageX - that.oldMousePos.x,
+						y: e.pageY - that.oldMousePos.y
+					}
+					//设置新位置(旧位置+鼠标偏移值)
+					this.style.top = that.oldPos.y + mouseMoved.y + "px";
+					this.style.left = that.oldPos.x + mouseMoved.x + "px";
+
+					this.style.cursor = "move";
+				}
+			}
+			//鼠标悬浮样式
+			function hoverFun(){
+				this.style.cursor = "pointer";
+			}
+		};
+	</script>
+</body>
+</html>
